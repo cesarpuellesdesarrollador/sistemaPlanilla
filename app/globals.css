@@ -1,0 +1,341 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  /* Paleta Corporativa "Academia" */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-900: #1e3a8a;
+
+  --color-slate-850: #1e293b; 
+
+  /* Animaciones Suaves */
+  --animate-enter: enter 0.4s ease-out;
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode para layout principal */
+.auth-layout {
+  background-color: rgb(248 250 252);
+}
+
+.dark .auth-layout {
+  background-color: rgb(2 6 23);
+}
+
+.auth-sidebar {
+  background-color: white;
+  border-right: 1px solid rgb(226 232 240);
+}
+
+.dark .auth-sidebar {
+  background-color: rgb(15 23 42);
+  border-right-color: rgb(51 65 85);
+}
+
+.auth-header {
+  background-color: white;
+  border-bottom: 1px solid rgb(226 232 240);
+}
+
+.dark .auth-header {
+  background-color: rgb(15 23 42);
+  border-bottom-color: rgb(51 65 85);
+}
+
+.auth-main {
+  background-color: rgb(248 250 252);
+}
+
+.dark .auth-main {
+  background-color: rgb(2 6 23);
+}
+
+/* Forzar colores de texto en dark mode */
+.dark .auth-main h1,
+.dark .auth-main h2,
+.dark .auth-main h3,
+.dark .auth-header h1,
+.dark .card h3 {
+  color: rgb(241 245 249) !important;
+}
+
+.dark .auth-main p,
+.dark .auth-header p {
+  color: rgb(148 163 184) !important;
+}
+
+.dark .text-slate-900 {
+  color: rgb(241 245 249) !important;
+}
+
+.dark .text-slate-800 {
+  color: rgb(226 232 240) !important;
+}
+
+.dark .text-slate-500 {
+  color: rgb(148 163 184) !important;
+}
+
+.dark .text-slate-400 {
+  color: rgb(148 163 184) !important;
+}
+
+/* Utilidades de UI personalizadas */
+.card {
+  background-color: white;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: box-shadow 0.3s;
+  overflow: hidden;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.dark .card {
+  background-color: rgb(30 41 59);
+  border-color: rgb(51 65 85);
+}
+
+.input-field {
+  display: flex;
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(226 232 240);
+  background-color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: rgb(15 23 42);
+}
+
+.dark .input-field {
+  border-color: rgb(51 65 85);
+  background-color: rgb(15 23 42);
+  color: rgb(241 245 249);
+}
+
+.input-field::placeholder {
+  color: rgb(100 116 139);
+}
+
+.dark .input-field::placeholder {
+  color: rgb(148 163 184);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: colors 0.2s;
+  background-color: rgb(37 99 235);
+  color: white;
+  height: 2.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.btn-primary:hover {
+  background-color: rgb(29 78 216);
+}
+
+.badge-success {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(167 243 208);
+  background-color: rgb(236 253 245);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(4 120 87);
+}
+
+.badge-pending {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(253 230 138);
+  background-color: rgb(254 252 232);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(180 83 9);
+}
+
+.badge-late {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(254 202 202);
+  background-color: rgb(254 242 242);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(185 28 28);
+}
+
+/* Scrollbar personalizado */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgb(71 85 105) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139);
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: rgb(71 85 105);
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139);
+}
+
+
+.dark .bg-white {
+  background-color: rgb(30 41 59) !important;
+}
+
+.dark .border-slate-200 {
+  border-color: rgb(51 65 85) !important;
+}
+
+.dark .text-slate-700 {
+  color: rgb(203 213 225) !important;
+}
+
+.dark .text-slate-600 {
+  color: rgb(148 163 184) !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: rgb(30 41 59) !important;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: rgb(51 65 85) !important;
+}
+
+/* Select items en dark mode */
+.dark [role="option"]:hover,
+.dark [role="option"][data-highlighted] {
+  background-color: rgb(71 85 105) !important;
+  color: rgb(226 232 240) !important;
+}
+
+.dark [data-radix-select-viewport] [role="option"] {
+  color: rgb(226 232 240) !important;
+}
+
+.dark [data-radix-select-viewport] [role="option"]:hover,
+.dark [data-radix-select-viewport] [role="option"][data-state="checked"],
+.dark [data-radix-select-viewport] [role="option"][data-highlighted] {
+  background-color: rgb(71 85 105) !important;
+  color: rgb(226 232 240) !important;
+}
+
+/* Native helpers for login branding and inputs (fallbacks) */
+.brand-title {
+  font-weight: 700;
+  font-size: 1.375rem; /* 22px */
+  color: var(--color-brand-600) !important;
+}
+.dark .brand-title {
+  color: var(--color-brand-100) !important;
+}
+
+.welcome-title {
+  font-size: 2.25rem; /* 36px */
+  font-weight: 700;
+  color: rgb(15 23 42) !important; /* slate-900 */
+}
+.dark .welcome-title {
+  color: rgb(241 245 249) !important; /* slate-100 */
+}
+/* Specificidad dirigida al layout de login usando id */
+#login-layout .welcome-title {
+  color: rgb(15 23 42) !important;
+}
+.dark #login-layout .welcome-title {
+  color: rgb(241 245 249) !important;
+}
+
+/* Login inputs are scoped to #login-layout below. */
+
+/* Variantes nativas removidas: inputs del login están scoped a #login-layout */
+
+/* Forzar colores white en caso de fallos de caché de utilidades */
+.brand-title, .welcome-title { color: #ffffff !important; }
+.dark .brand-title, .dark .welcome-title { color: #ffffff !important; }
+
+/* Asegurar contraste en inputs en modo oscuro */
+.dark .login-input, .dark .login-input-rounded-xl { background: rgb(15 23 42) !important; color: rgb(241 245 249) !important; border-color: rgb(51 65 85) !important; }
+
+/* Force h1 white when Tailwind utilities/cache fail on Netlify */
+h1.text-slate-900 {
+  color: #ffffff !important;
+}
+.dark h1.text-slate-900 {
+  color: #ffffff !important;
+}
+#login-layout h1.text-slate-900 {
+  color: #ffffff !important;
+}
+.dark #login-layout h1.text-slate-900 {
+  color: #ffffff !important;
+}
+
+/* Force logo and headings to white when Tailwind utilities are missing */
+span.text-2xl {
+  color: var(--color-brand-600) !important;
+}
+.dark span.text-2xl {
+  color: var(--color-brand-100) !important;
+}
+
+/* Ensure heading colors match project palette in light/dark explicitly */
+h1.text-slate-900 {
+  color: rgb(15 23 42) !important;
+}
+.dark h1.text-slate-900 {
+  color: rgb(241 245 249) !important;
+}
