@@ -98,12 +98,15 @@ export function validateEmployeePayload(payload: any, options?: { partial?: bool
 
   // employeeNumber/email basic checks
   if (employeeNumberRaw != null) {
-    if (String(employeeNumberRaw).trim().length === 0) errors.push('employeeNumber inválido')
+    const en = String(employeeNumberRaw).trim()
+    if (en.length === 0) errors.push('employeeNumber inválido')
   }
   if (emailRaw != null) {
     const e = String(emailRaw).trim()
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRe.test(e)) errors.push('Email no tiene un formato válido')
+    if (e.length > 0) {
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRe.test(e)) errors.push('Email no tiene un formato válido')
+    }
   }
 
   const llegadaPlanDate = parseFlexibleDate(llegadaPlan)
@@ -122,15 +125,6 @@ export function validateEmployeePayload(payload: any, options?: { partial?: bool
 
   if (llegadaPlanDate && salidaPlanDate && salidaPlanDate < llegadaPlanDate) errors.push('Fecha salida planificada es anterior a llegada planificada')
   if (inicioPermisoDate && finPermisoDate && finPermisoDate < inicioPermisoDate) errors.push('Fecha fin permiso es anterior a fecha inicio permiso')
-
-  // optional coherence checks
-  if (llegadaRealDate && llegadaPlanDate && llegadaRealDate < llegadaPlanDate) {
-    // arrival real before planned arrival is suspicious but allow (warning)
-    errors.push('Fecha llegada real anterior a la llegada planificada')
-  }
-  if (salidaRealDate && salidaPlanDate && salidaRealDate < salidaPlanDate) {
-    errors.push('Fecha salida real anterior a la salida planificada')
-  }
 
   // Normalize names: prefer fullName; derive first/last if needed
   const normalized: Record<string, any> = {}
@@ -164,8 +158,14 @@ export function validateEmployeePayload(payload: any, options?: { partial?: bool
     normalized.fullName = `${firstName} ${lastName}`
   }
 
-  if (employeeNumberRaw != null) normalized.employeeNumber = String(employeeNumberRaw).trim()
-  if (emailRaw != null) normalized.email = String(emailRaw).trim()
+  if (employeeNumberRaw != null) {
+    const en = String(employeeNumberRaw).trim()
+    if (en.length > 0) normalized.employeeNumber = en
+  }
+  if (emailRaw != null) {
+    const e = String(emailRaw).trim()
+    if (e.length > 0) normalized.email = e
+  }
 
   return { valid: errors.length === 0, errors, normalized }
 }

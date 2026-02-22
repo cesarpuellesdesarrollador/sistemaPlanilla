@@ -186,7 +186,8 @@ export async function POST(request: Request) {
         const key = mapHeaderToKey(h)
         const val = r[i]
         if (!key) return
-        obj[key] = val == null ? '' : String(val).trim()
+        const strVal = val == null ? '' : String(val).trim()
+        obj[key] = strVal === '' ? null : strVal
       })
       const validation = validateEmployeePayload(obj)
       // detect match against existing store
