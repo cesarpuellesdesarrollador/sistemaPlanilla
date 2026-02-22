@@ -651,20 +651,20 @@ export default function EmployeesPage() {
   }, [])
 
   const createEmptyWorker = (): Partial<Worker> => ({
-    departamento: masters?.departments?.[0] ?? 'Administración',
-    ocupacion: masters?.occupations?.[0] ?? 'Empleado/a',
+    departamento: '',
+    ocupacion: '',
     estado: (masters?.states?.[0] as Worker['estado']) ?? 'activo',
-    fullName: 'Empleado/a Ejemplo',
-    firstName: 'Empleado',
-    lastName: 'Ejemplo',
-    employeeNumber: null,
-    email: null,
-    fechaLlegadaPlanificada: new Date(),
-    fechaLlegadaReal: null,
-    fechaSalidaPlanificada: new Date(),
-    fechaSalidaReal: null,
-    inicioPermisoTrabajo: new Date(),
-    finPermisoTrabajo: new Date(),
+    fullName: '',
+    firstName: '',
+    lastName: '',
+    employeeNumber: undefined,
+    email: undefined,
+    fechaLlegadaPlanificada: undefined,
+    fechaLlegadaReal: undefined,
+    fechaSalidaPlanificada: undefined,
+    fechaSalidaReal: undefined,
+    inicioPermisoTrabajo: undefined,
+    finPermisoTrabajo: undefined,
   })
 
   const handleCreate = async (payload: Partial<Worker>) => {
