@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { validateEmployeePayload } from '@/lib/validators'
-import { createEmployee, findEmployeeByIdentifiers, updateEmployee } from '@/lib/employeesStore'
+import { createEmployee, findEmployeeByIdentifiers, findEmployeeByEmail, findEmployeeByEmailExhaustive, updateEmployee } from '@/lib/employeesStore'
 import xlsx from 'node-xlsx'
 
 function stripAccents(s: string) {
@@ -139,8 +139,25 @@ export async function POST(request: Request) {
             if (!full.valid) {
               errors.push({ row: idx + 1, errors: full.errors, original: r })
             } else {
-              createEmployee(full.normalized || r)
-              createdCount += 1
+              try {
+                createEmployee(full.normalized || r)
+                createdCount += 1
+              } catch (createErr: any) {
+                // Safeguard: if email already exists, try to find and update instead
+                if (createErr?.message?.includes('email already exists')) {
+                  const emailToSearch = full.normalized?.email || r.email
+                  const byEmail = emailToSearch ? findEmployeeByEmailExhaustive(emailToSearch) : null
+                  if (byEmail && (mode === 'merge' || mode === 'overwrite')) {
+                    const updated = updateEmployee(byEmail.id, full.normalized || r)
+                    if (updated) updatedCount += 1
+                    else errors.push({ row: idx + 1, errors: [createErr.message], original: r })
+                  } else {
+                    errors.push({ row: idx + 1, errors: [createErr.message], original: r })
+                  }
+                } else {
+                  throw createErr
+                }
+              }
             }
           }
         } catch (err: any) {
@@ -249,8 +266,25 @@ export async function POST(request: Request) {
           if (!full.valid) {
             errors.push({ row: r.row, errors: full.errors, original: r.raw })
           } else {
-            createEmployee(full.normalized || payload)
-            createdCount += 1
+            try {
+              createEmployee(full.normalized || payload)
+              createdCount += 1
+            } catch (createErr: any) {
+              // Safeguard: if email already exists, try to find and update instead
+              if (createErr?.message?.includes('email already exists')) {
+                const emailToSearch = full.normalized?.email || payload.email
+                const byEmail = emailToSearch ? findEmployeeByEmailExhaustive(emailToSearch) : null
+                if (byEmail && (mode === 'merge' || mode === 'overwrite')) {
+                  const updated = updateEmployee(byEmail.id, full.normalized || payload)
+                  if (updated) updatedCount += 1
+                  else errors.push({ row: r.row, errors: [createErr.message], original: r.raw })
+                } else {
+                  errors.push({ row: r.row, errors: [createErr.message], original: r.raw })
+                }
+              } else {
+                throw createErr
+              }
+            }
           }
         }
       } catch (err: any) {

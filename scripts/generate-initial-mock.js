@@ -37,8 +37,11 @@ function createWorker(id) {
   const inicioPermisoTrabajo = new Date(fechaLlegadaPlanificada.getTime() - (15 + Math.random() * 30) * 24 * 60 * 60 * 1000)
   const finPermisoTrabajo = new Date(fechaSalidaPlanificada.getTime() + (365) * 24 * 60 * 60 * 1000)
 
-  const employeeNumber = Math.random() > 0.6 ? `EMP-${1000 + id}` : null
-  const email = Math.random() > 0.7 ? `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com` : null
+  // OBLIGATORIO: employeeNumber siempre presente y único (identificador principal)
+  const employeeNumber = `EMP-${String(id).padStart(6, '0')}`
+  
+  // Email: presente 70% del tiempo (no es obligatorio pero recomendado)
+  const email = Math.random() > 0.3 ? `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${id}@example.com` : null
 
   return {
     id,

@@ -192,7 +192,11 @@ export function createEmployee(payload: Partial<Worker>) {
     if (exists) throw new Error('employeeNumber already exists')
   }
   if (payload.email) {
-    const exists = employees.some((e) => e.email && (e.email || '').toLowerCase() === String(payload.email).toLowerCase())
+    // Try exhaustive search first (normalizing spaces)
+    const byEmailExhaustive = findEmployeeByEmailExhaustive(payload.email)
+    if (byEmailExhaustive) throw new Error('email already exists')
+    // Also standard search as backup
+    const exists = employees.some((e) => e.email && String(e.email).trim().toLowerCase() === String(payload.email).trim().toLowerCase())
     if (exists) throw new Error('email already exists')
   }
 
@@ -230,7 +234,16 @@ export function updateEmployee(id: number, patch: Partial<Worker>) {
     if (clash) throw new Error('employeeNumber already exists')
   }
   if (patch.email) {
-    const clash = employees.find((e) => e.email && e.email.toLowerCase() === String(patch.email).toLowerCase() && e.id !== id)
+    // Exhaustive search first
+    const searchEmail = String(patch.email).trim().toLowerCase().replace(/\s+/g, ' ')
+    const clashExhaustive = employees.find((e) => {
+      if (!e.email || e.id === id) return false
+      const dbEmail = String(e.email).trim().toLowerCase().replace(/\s+/g, ' ')
+      return dbEmail === searchEmail
+    })
+    if (clashExhaustive) throw new Error('email already exists')
+    // Standard search as backup
+    const clash = employees.find((e) => e.email && String(e.email).trim().toLowerCase() === String(patch.email).trim().toLowerCase() && e.id !== id)
     if (clash) throw new Error('email already exists')
   }
 
@@ -278,22 +291,42 @@ export function bulkUpdate(ids: number[], patch: Partial<Worker>) {
 }
 
 // Find an existing employee by common identifiers (employeeNumber, email, id, fallback by name+department+occupation)
+export function findEmployeeByEmail(email: string | null): Worker | null {
+  if (!email) return null
+  const em = String(email).trim().toLowerCase()
+  return employees.find((e) => e.email && String(e.email).trim().toLowerCase() === em) || null
+}
+
+// Exhaustive search: normalize spaces, remove extra whitespace patterns
+export function findEmployeeByEmailExhaustive(email: string | null): Worker | null {
+  if (!email) return null
+  const searchEmail = String(email).trim().toLowerCase().replace(/\s+/g, ' ')
+  return employees.find((e) => {
+    if (!e.email) return false
+    const dbEmail = String(e.email).trim().toLowerCase().replace(/\s+/g, ' ')
+    return dbEmail === searchEmail
+  }) || null
+}
+
 export function findEmployeeByIdentifiers(payload: Partial<Worker>) {
   if (!payload) return null
+  // First try ID (most precise)
   if (payload.id != null) {
     const byId = getById(Number(payload.id))
     if (byId) return byId
   }
+  // Email search is ALWAYS reliable - prioritize heavily (use exhaustive search)
+  if (payload.email) {
+    const byEmailExhaustive = findEmployeeByEmailExhaustive(payload.email)
+    if (byEmailExhaustive) return byEmailExhaustive
+  }
+  // Employee number search
   if (payload.employeeNumber) {
     const num = String(payload.employeeNumber).trim()
     const found = employees.find((e) => e.employeeNumber && String(e.employeeNumber).trim() === num)
     if (found) return found
   }
-  if (payload.email) {
-    const em = String(payload.email).trim().toLowerCase()
-    const found = employees.find((e) => e.email && String(e.email).trim().toLowerCase() === em)
-    if (found) return found
-  }
+  // Composite search by name + dept + occupation (least precise)
   if (payload.fullName && payload.departamento && payload.ocupacion) {
     const name = String(payload.fullName).trim().toLowerCase()
     const dept = String(payload.departamento).trim().toLowerCase()

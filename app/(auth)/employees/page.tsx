@@ -295,12 +295,14 @@ export default function EmployeesPage() {
         const json = await resp.json().catch(() => ({}))
         if (!resp.ok || !json.previewRows) {
           toast.error(json.error || 'No se pudo obtener vista previa del archivo', { id: toastId })
+          if (fileInputRef.current) fileInputRef.current.value = ''
           return
         }
         setImportPreview(json.previewRows.slice(0, 500))
         setImportErrors([])
         setImportTotalRows(json.totalRows || json.previewRows.length)
         toast.success(`Vista previa (XLSX): ${json.totalRows || json.previewRows.length} filas (mostrando ${Math.min(500, json.previewRows.length)})`, { id: toastId })
+        if (fileInputRef.current) fileInputRef.current.value = ''
         return
       }
 
@@ -309,15 +311,18 @@ export default function EmployeesPage() {
       const json = await resp.json().catch(() => ({}))
       if (!resp.ok || !json.previewRows) {
         toast.error(json.error || 'No se pudo obtener vista previa del archivo', { id: toastId })
+        if (fileInputRef.current) fileInputRef.current.value = ''
         return
       }
       setImportPreview(json.previewRows.slice(0, 500))
       setImportErrors([])
       setImportTotalRows(json.totalRows || json.previewRows.length)
       toast.success(`Vista previa: ${json.totalRows || json.previewRows.length} filas (mostrando ${Math.min(500, json.previewRows.length)})`, { id: toastId })
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     } catch (err) {
       toast.error('Error al leer el archivo', { id: toastId })
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
