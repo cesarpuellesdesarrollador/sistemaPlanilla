@@ -672,7 +672,11 @@ export default function EmployeesPage() {
       const resp = await fetch('/api/planning/employees', { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } })
       if (!resp.ok) {
         const j = await resp.json().catch(() => ({}))
-        toast.error(j.error || 'Error al crear empleado')
+        if (j.details && Array.isArray(j.details)) {
+          j.details.forEach((err: string) => toast.error(err))
+        } else {
+          toast.error(j.error || 'Error al crear empleado')
+        }
         return
       }
       toast.success('Empleado creado')
@@ -690,7 +694,11 @@ export default function EmployeesPage() {
       const resp = await fetch('/api/planning/employees', { method: 'PUT', body: JSON.stringify({ id, ...payload }), headers: { 'Content-Type': 'application/json' } })
       if (!resp.ok) {
         const j = await resp.json().catch(() => ({}))
-        toast.error(j.error || 'Error al actualizar empleado')
+        if (j.details && Array.isArray(j.details)) {
+          j.details.forEach((err: string) => toast.error(err))
+        } else {
+          toast.error(j.error || 'Error al actualizar empleado')
+        }
         return
       }
       toast.success('Empleado actualizado')

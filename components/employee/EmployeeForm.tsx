@@ -13,51 +13,44 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
   const [errors, setErrors] = useState<Record<string, string>>({})
   const { masters } = useMasters()
 
-  useEffect(() => setForm(initial), [initial])
+  useEffect(() => {
+    const parsed = { ...initial }
+    const dateFields = ['fechaLlegadaPlanificada', 'fechaLlegadaReal', 'fechaSalidaPlanificada', 'fechaSalidaReal', 'inicioPermisoTrabajo', 'finPermisoTrabajo'] as const
+    dateFields.forEach((field) => {
+      if (parsed[field] && !(parsed[field] instanceof Date)) {
+        const d = new Date(String(parsed[field]))
+        if (!isNaN(d.getTime())) {
+          parsed[field] = d
+        }
+      }
+    })
+    setForm(parsed)
+  }, [initial])
 
   const setField = (k: keyof Partial<Worker>, v: any) => setForm((s) => ({ ...s, [k]: v }))
 
-  // Mapeo semántico de departamentos a ocupaciones
+  // Mapeo directo de departamentos a ocupaciones
   const getOccupationsForDepartment = (dept: string | undefined): string[] => {
     if (!dept || !masters?.occupations) return masters?.occupations || []
     
-    const deptLower = String(dept).toLowerCase()
-    const occsLower = (masters?.occupations || []).map(o => ({ orig: o, lower: o.toLowerCase() }))
-    
-    // Palabras clave por departamento (criterio de producción)
-    const departmentKeywords: Record<string, string[]> = {
-      'recepción': ['recepcionista', 'conserje', 'portero', 'vigilancia'],
-      'admin': ['administrativo', 'secretaria', 'asistente', 'gerente', 'supervisor'],
-      'contabilidad': ['contable', 'auditor', 'tesorero', 'analista financiero'],
-      'ventas': ['vendedor', 'asesor', 'comercial', 'gerente de ventas'],
-      'marketing': ['marketing', 'especialista', 'community', 'especialista en'],
-      'logística': ['logística', 'almacenero', 'conductor', 'operario'],
-      'recursos humanos': ['rrhh', 'recursos humanos', 'reclutador'],
-      'ti': ['programador', 'desarrollador', 'técnico', 'analista', 'administrador de sistemas'],
-      'soporte': ['soporte', 'técnico', 'especialista'],
-      'producción': ['operario', 'supervisor', 'jefe de línea', 'mecánico'],
+    const allOccs = masters?.occupations || []
+    const deptMap: Record<string, string[]> = {
+      'Cocina': ['Jefe de Cocina', 'Cocinero/a', 'Ayudante de Cocina', 'Friegaplatos'],
+      'Limpieza': ['Gobernante/a', 'Camarero/a de pisos', 'Mozo de habitaciones'],
+      'Recepción': ['Jefe de Recepción', 'Recepcionista', 'Botones'],
+      'Mantenimiento': ['Jefe de Mantenimiento', 'Técnico de mantenimiento'],
+      'Administración': ['Director/a', 'Contable', 'Jefe de RRHH'],
+      'Animación': ['Jefe de Animación', 'Animador/a'],
+      'Bar': ['Barman', 'Camarero/a de barra'],
+      'Restaurante': ['Camarero/a de barra', 'Barman', 'Jefe de Cocina', 'Cocinero/a'],
     }
     
-    // Buscar palabras clave que coincidan con el departamento
-    let relevantKeywords: string[] = []
-    for (const [dept, keywords] of Object.entries(departmentKeywords)) {
-      if (deptLower.includes(dept)) {
-        relevantKeywords = keywords
-        break
-      }
+    const mapped = deptMap[dept]
+    if (mapped) {
+      return mapped.filter(occ => allOccs.includes(occ))
     }
     
-    // Si encontramos palabras clave, filtrar ocupaciones
-    if (relevantKeywords.length > 0) {
-      return occsLower
-        .filter(occ => 
-          relevantKeywords.some(kw => occ.lower.includes(kw))
-        )
-        .map(occ => occ.orig)
-    }
-    
-    // Si no hay coincidencias, retornar todas las ocupaciones
-    return masters?.occupations || []
+    return allOccs
   }
 
   const parseDate = (v: any): Date | null => {
@@ -101,15 +94,15 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.fullName, form.email, form.departamento, form.ocupacion, form.employeeNumber, form.fechaLlegadaPlanificada, form.fechaSalidaPlanificada, form.inicioPermisoTrabajo, form.finPermisoTrabajo])
 
-  // Limpiar ocupación cuando cambia el departamento
+  // Limpiar ocupación solo si el departamento cambió explícitamente y la ocupación no es válida
   useEffect(() => {
-    if (form.ocupacion && form.departamento) {
+    if (form.ocupacion && form.departamento && initial.id) {
       const ocupacionesValidas = getOccupationsForDepartment(form.departamento)
       if (!ocupacionesValidas.includes(form.ocupacion)) {
         setField('ocupacion', '')
       }
     }
-  }, [form.departamento])
+  }, [form.departamento, initial.id, masters?.occupations])
 
   const hasErrors = Object.keys(errors).length > 0
 

@@ -210,7 +210,7 @@ export function createEmployee(payload: Partial<Worker>) {
     fullName: payload.fullName || `${payload.firstName || 'Empleado'} ${payload.lastName || ''}`.trim(),
     firstName: payload.firstName || undefined,
     lastName: payload.lastName || undefined,
-    employeeNumber: payload.employeeNumber || null,
+    employeeNumber: payload.employeeNumber || `EMP-${String(id).padStart(6, '0')}`,
     email: payload.email || null,
     fechaLlegadaPlanificada: ensureDate(payload.fechaLlegadaPlanificada) || new Date(),
     fechaLlegadaReal: ensureDate(payload.fechaLlegadaReal) || null,

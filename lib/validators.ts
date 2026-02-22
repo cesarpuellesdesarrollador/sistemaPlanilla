@@ -59,32 +59,23 @@ export function validateEmployeePayload(payload: any, options?: { partial?: bool
   const masters = getMasters()
 
   if (!partial) {
+    if (!fullNameRaw && !(firstNameRaw && lastNameRaw)) {
+      errors.push('El nombre completo es requerido')
+    }
+
     if (!departamento || typeof departamento !== 'string' || departamento.trim().length === 0) {
-      errors.push('Departamento es requerido')
+      errors.push('El departamento es requerido')
     } else if (!masters.departments.includes(departamento)) {
-      errors.push(`Departamento desconocido: ${departamento}`)
+      errors.push(`Departamento no válido: ${departamento}`)
     }
 
     if (!ocupacion || typeof ocupacion !== 'string' || ocupacion.trim().length === 0) {
-      errors.push('Ocupación es requerida')
+      errors.push('La ocupación es requerida')
     }
+  }
 
-    if (!estadoRaw || typeof estadoRaw !== 'string') {
-      errors.push('Estado es requerido')
-    }
-
-    if (!llegadaPlan) {
-      errors.push('Fecha llegada planificada es requerida')
-    }
-
-    if (!salidaPlan) {
-      errors.push('Fecha salida planificada es requerida')
-    }
-
-    // identity requirement: require at least fullName or structured names
-    if (!fullNameRaw && !(firstNameRaw && lastNameRaw)) {
-      errors.push('Nombre completo (fullName) o firstName+lastName son requeridos')
-    }
+  if (estadoRaw != null && (typeof estadoRaw !== 'string')) {
+    errors.push('El estado debe ser un valor válido')
   }
 
   // estado normalization
@@ -93,19 +84,17 @@ export function validateEmployeePayload(payload: any, options?: { partial?: bool
     const s = String(estadoRaw).trim().toLowerCase()
     if (s === 'activo' || s === 'activo(a)') estado = 'activo'
     else if (s === 'no activo' || s === 'no_activo' || s === 'no-activo' || s === 'inactivo' || s === 'noactivo') estado = 'no activo'
-    else errors.push(`Estado no válido: ${estadoRaw}`)
+    else estado = 'activo' // default if invalid
+  } else {
+    estado = 'activo' // default if not provided
   }
 
-  // employeeNumber/email basic checks
-  if (employeeNumberRaw != null) {
-    const en = String(employeeNumberRaw).trim()
-    if (en.length === 0) errors.push('employeeNumber inválido')
-  }
+  // email validation
   if (emailRaw != null) {
     const e = String(emailRaw).trim()
     if (e.length > 0) {
       const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRe.test(e)) errors.push('Email no tiene un formato válido')
+      if (!emailRe.test(e)) errors.push('El correo electrónico tiene un formato inválido')
     }
   }
 
@@ -116,15 +105,15 @@ export function validateEmployeePayload(payload: any, options?: { partial?: bool
   const inicioPermisoDate = parseFlexibleDate(inicioPermiso)
   const finPermisoDate = parseFlexibleDate(finPermiso)
 
-  if (llegadaPlan != null && !llegadaPlanDate) errors.push('Fecha llegada planificada inválida')
-  if (salidaPlan != null && !salidaPlanDate) errors.push('Fecha salida planificada inválida')
-  if (llegadaReal != null && !llegadaRealDate) errors.push('Fecha llegada real inválida')
-  if (salidaReal != null && !salidaRealDate) errors.push('Fecha salida real inválida')
-  if (inicioPermiso != null && !inicioPermisoDate) errors.push('Fecha inicio permiso inválida')
-  if (finPermiso != null && !finPermisoDate) errors.push('Fecha fin permiso inválida')
+  if (llegadaPlan != null && !llegadaPlanDate) errors.push('La fecha de llegada planificada tiene un formato inválido')
+  if (salidaPlan != null && !salidaPlanDate) errors.push('La fecha de salida planificada tiene un formato inválido')
+  if (llegadaReal != null && !llegadaRealDate) errors.push('La fecha de llegada real tiene un formato inválido')
+  if (salidaReal != null && !salidaRealDate) errors.push('La fecha de salida real tiene un formato inválido')
+  if (inicioPermiso != null && !inicioPermisoDate) errors.push('La fecha de inicio de permiso tiene un formato inválido')
+  if (finPermiso != null && !finPermisoDate) errors.push('La fecha de fin de permiso tiene un formato inválido')
 
-  if (llegadaPlanDate && salidaPlanDate && salidaPlanDate < llegadaPlanDate) errors.push('Fecha salida planificada es anterior a llegada planificada')
-  if (inicioPermisoDate && finPermisoDate && finPermisoDate < inicioPermisoDate) errors.push('Fecha fin permiso es anterior a fecha inicio permiso')
+  if (llegadaPlanDate && salidaPlanDate && salidaPlanDate < llegadaPlanDate) errors.push('La fecha de salida debe ser igual o posterior a la fecha de llegada')
+  if (inicioPermisoDate && finPermisoDate && finPermisoDate < inicioPermisoDate) errors.push('La fecha de fin del permiso debe ser igual o posterior a la fecha de inicio')
 
   // Normalize names: prefer fullName; derive first/last if needed
   const normalized: Record<string, any> = {}
