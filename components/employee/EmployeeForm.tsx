@@ -56,7 +56,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
     setErrors(validate(form))
     // validate when important fields change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.departamento, form.ocupacion, form.employeeNumber, form.fechaLlegadaPlanificada, form.fechaSalidaPlanificada, form.inicioPermisoTrabajo, form.finPermisoTrabajo])
+  }, [form.fullName, form.email, form.departamento, form.ocupacion, form.employeeNumber, form.fechaLlegadaPlanificada, form.fechaSalidaPlanificada, form.inicioPermisoTrabajo, form.finPermisoTrabajo])
 
   const hasErrors = Object.keys(errors).length > 0
 
@@ -123,7 +123,26 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
 
       <div className="min-h-[104px]">
         <label className="text-xs text-slate-400 mb-1 block">Ocupación</label>
-        <input placeholder="Ej. Recepcionista, Cocinero/a" aria-invalid={Boolean(errors.ocupacion)} aria-describedby={`${errors.ocupacion ? 'err-ocupacion' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.ocupacion ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100`} value={form.ocupacion || ''} onChange={(e) => setField('ocupacion', e.target.value)} />
+        <Select.Root value={String(form.ocupacion ?? '')} onValueChange={(v) => setField('ocupacion', v)}>
+          <Select.Trigger aria-invalid={Boolean(errors.ocupacion)} aria-describedby={`${errors.ocupacion ? 'err-ocupacion' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.ocupacion ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 flex items-center justify-between text-sm whitespace-nowrap`}>
+            <Select.Value placeholder="Ocupación" />
+            <Select.Icon>
+              <ChevronDown size={16} className="text-slate-400" />
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content className="overflow-hidden bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-50">
+              <Select.Viewport className="p-1">
+                {(masters?.occupations || []).map((o) => (
+                  <Select.Item key={o} value={o} className="relative flex items-center px-8 py-2 text-sm text-slate-900 dark:text-slate-200 rounded cursor-pointer select-none outline-none hover:bg-slate-100 dark:hover:bg-slate-600">
+                    <Select.ItemIndicator className="absolute left-2 inline-flex items-center"><Check size={14} /></Select.ItemIndicator>
+                    <Select.ItemText>{o}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
         {errors.ocupacion && <p id="err-ocupacion" className="mt-2 text-xs text-red-400">{errors.ocupacion}</p>}
       </div>
 
