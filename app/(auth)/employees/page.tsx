@@ -328,6 +328,8 @@ export default function EmployeesPage() {
 
   const confirmImport = async () => {
     if (!importPreview || !importPreview.length) return toast.error('Nada que importar')
+    
+    const confirmToastId = toast.loading('Importando datos...')
     setIsImporting(true)
 
     // thresholds for "long" imports
@@ -340,7 +342,7 @@ export default function EmployeesPage() {
       const validRows = importPreview.filter((r) => r.valid)
       const invalidRows = importPreview.filter((r) => !r.valid)
       if (validRows.length === 0) {
-        toast.error('No hay filas válidas para importar')
+        toast.error('No hay filas válidas para importar', { id: confirmToastId })
         setIsImporting(false)
         return
       }
@@ -363,7 +365,7 @@ export default function EmployeesPage() {
         const resp = await fetch('/api/planning/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: importFileName, content: importFileContent, mode: importMode }) })
         const json = await resp.json().catch(() => ({}))
         if (!resp.ok) {
-          toast.error(json.error || 'Error en importación de archivo')
+          toast.error(json.error || 'Error en importación de archivo', { id: confirmToastId })
           setIsImporting(false)
           return
         }
@@ -387,7 +389,9 @@ export default function EmployeesPage() {
         setImportFileName(null)
         setImportTotalRows(null)
 
-        if (succeeded > 0) toast.success(`${succeeded} filas importadas correctamente`)
+        if (succeeded > 0) {
+          toast.success(`${succeeded} filas importadas correctamente`, { id: confirmToastId })
+        }
         if (failed > 0) toast.error(`${failed} filas fallaron al importar`)
         fetchData()
         setIsImporting(false)
@@ -416,13 +420,15 @@ export default function EmployeesPage() {
       }
 
       setImportPreview(null)
-      if (succeeded > 0) toast.success(`${succeeded} filas importadas correctamente`)
+      if (succeeded > 0) {
+        toast.success(`${succeeded} filas importadas correctamente`, { id: confirmToastId })
+      }
       if (failed > 0) toast.error(`${failed} filas fallaron al importar`)
       if (invalidRows.length > 0) toast.error(`${invalidRows.length} filas tenían errores y fueron omitidas`)
 
       fetchData()
     } catch (err) {
-      toast.error('Error al importar')
+      toast.error('Error al importar', { id: confirmToastId })
     } finally {
       if (longImportTimer) clearTimeout(longImportTimer)
       setIsImporting(false)
