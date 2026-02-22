@@ -17,6 +17,49 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
 
   const setField = (k: keyof Partial<Worker>, v: any) => setForm((s) => ({ ...s, [k]: v }))
 
+  // Mapeo semántico de departamentos a ocupaciones
+  const getOccupationsForDepartment = (dept: string | undefined): string[] => {
+    if (!dept || !masters?.occupations) return masters?.occupations || []
+    
+    const deptLower = String(dept).toLowerCase()
+    const occsLower = (masters?.occupations || []).map(o => ({ orig: o, lower: o.toLowerCase() }))
+    
+    // Palabras clave por departamento (criterio de producción)
+    const departmentKeywords: Record<string, string[]> = {
+      'recepción': ['recepcionista', 'conserje', 'portero', 'vigilancia'],
+      'admin': ['administrativo', 'secretaria', 'asistente', 'gerente', 'supervisor'],
+      'contabilidad': ['contable', 'auditor', 'tesorero', 'analista financiero'],
+      'ventas': ['vendedor', 'asesor', 'comercial', 'gerente de ventas'],
+      'marketing': ['marketing', 'especialista', 'community', 'especialista en'],
+      'logística': ['logística', 'almacenero', 'conductor', 'operario'],
+      'recursos humanos': ['rrhh', 'recursos humanos', 'reclutador'],
+      'ti': ['programador', 'desarrollador', 'técnico', 'analista', 'administrador de sistemas'],
+      'soporte': ['soporte', 'técnico', 'especialista'],
+      'producción': ['operario', 'supervisor', 'jefe de línea', 'mecánico'],
+    }
+    
+    // Buscar palabras clave que coincidan con el departamento
+    let relevantKeywords: string[] = []
+    for (const [dept, keywords] of Object.entries(departmentKeywords)) {
+      if (deptLower.includes(dept)) {
+        relevantKeywords = keywords
+        break
+      }
+    }
+    
+    // Si encontramos palabras clave, filtrar ocupaciones
+    if (relevantKeywords.length > 0) {
+      return occsLower
+        .filter(occ => 
+          relevantKeywords.some(kw => occ.lower.includes(kw))
+        )
+        .map(occ => occ.orig)
+    }
+    
+    // Si no hay coincidencias, retornar todas las ocupaciones
+    return masters?.occupations || []
+  }
+
   const parseDate = (v: any): Date | null => {
     if (!v) return null
     if (v instanceof Date) return v
@@ -57,6 +100,16 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
     // validate when important fields change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.fullName, form.email, form.departamento, form.ocupacion, form.employeeNumber, form.fechaLlegadaPlanificada, form.fechaSalidaPlanificada, form.inicioPermisoTrabajo, form.finPermisoTrabajo])
+
+  // Limpiar ocupación cuando cambia el departamento
+  useEffect(() => {
+    if (form.ocupacion && form.departamento) {
+      const ocupacionesValidas = getOccupationsForDepartment(form.departamento)
+      if (!ocupacionesValidas.includes(form.ocupacion)) {
+        setField('ocupacion', '')
+      }
+    }
+  }, [form.departamento])
 
   const hasErrors = Object.keys(errors).length > 0
 
@@ -123,9 +176,9 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
 
       <div className="min-h-[104px]">
         <label className="text-xs text-slate-400 mb-1 block">Ocupación</label>
-        <Select.Root value={String(form.ocupacion ?? '')} onValueChange={(v) => setField('ocupacion', v)}>
-          <Select.Trigger aria-invalid={Boolean(errors.ocupacion)} aria-describedby={`${errors.ocupacion ? 'err-ocupacion' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.ocupacion ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 flex items-center justify-between text-sm whitespace-nowrap`}>
-            <Select.Value placeholder="Ocupación" />
+        <Select.Root value={String(form.ocupacion ?? '')} onValueChange={(v) => setField('ocupacion', v)} disabled={!form.departamento}>
+          <Select.Trigger aria-invalid={Boolean(errors.ocupacion)} aria-describedby={`${errors.ocupacion ? 'err-ocupacion' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.ocupacion ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 flex items-center justify-between text-sm whitespace-nowrap ${!form.departamento ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <Select.Value placeholder={!form.departamento ? "Seleccione departamento primero" : "Ocupación"} />
             <Select.Icon>
               <ChevronDown size={16} className="text-slate-400" />
             </Select.Icon>
@@ -133,7 +186,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
           <Select.Portal>
             <Select.Content className="overflow-hidden bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-50">
               <Select.Viewport className="p-1">
-                {(masters?.occupations || []).map((o) => (
+                {getOccupationsForDepartment(form.departamento).map((o) => (
                   <Select.Item key={o} value={o} className="relative flex items-center px-8 py-2 text-sm text-slate-900 dark:text-slate-200 rounded cursor-pointer select-none outline-none hover:bg-slate-100 dark:hover:bg-slate-600">
                     <Select.ItemIndicator className="absolute left-2 inline-flex items-center"><Check size={14} /></Select.ItemIndicator>
                     <Select.ItemText>{o}</Select.ItemText>
