@@ -277,6 +277,9 @@ export default function EmployeesPage() {
 
   const onSelectFile = async (file?: File | null) => {
     if (!file) return
+    
+    const toastId = toast.loading('Procesando archivo...')
+    
     try {
       const name = (file.name || '').toLowerCase()
 
@@ -291,29 +294,30 @@ export default function EmployeesPage() {
         const resp = await fetch('/api/planning/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, content: b64, preview: true }) })
         const json = await resp.json().catch(() => ({}))
         if (!resp.ok || !json.previewRows) {
-          console.error('preview xlsx failed', json)
-          return toast.error(json.error || 'No se pudo obtener vista previa del archivo')
+          toast.error(json.error || 'No se pudo obtener vista previa del archivo', { id: toastId })
+          return
         }
         setImportPreview(json.previewRows.slice(0, 500))
         setImportErrors([])
         setImportTotalRows(json.totalRows || json.previewRows.length)
-        return toast.success(`Vista previa (XLSX): ${json.totalRows || json.previewRows.length} filas (mostrando ${Math.min(500, json.previewRows.length)})`)
+        toast.success(`Vista previa (XLSX): ${json.totalRows || json.previewRows.length} filas (mostrando ${Math.min(500, json.previewRows.length)})`, { id: toastId })
+        return
       }
 
       // otherwise treat as CSV -> ask server for preview (server will detect matches + header mapping)
       const resp = await fetch('/api/planning/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, content: b64, preview: true }) })
       const json = await resp.json().catch(() => ({}))
       if (!resp.ok || !json.previewRows) {
-        console.error('preview csv failed', json)
-        return toast.error(json.error || 'No se pudo obtener vista previa del archivo')
+        toast.error(json.error || 'No se pudo obtener vista previa del archivo', { id: toastId })
+        return
       }
       setImportPreview(json.previewRows.slice(0, 500))
       setImportErrors([])
       setImportTotalRows(json.totalRows || json.previewRows.length)
-      return toast.success(`Vista previa: ${json.totalRows || json.previewRows.length} filas (mostrando ${Math.min(500, json.previewRows.length)})`)
+      toast.success(`Vista previa: ${json.totalRows || json.previewRows.length} filas (mostrando ${Math.min(500, json.previewRows.length)})`, { id: toastId })
+      return
     } catch (err) {
-      console.error(err)
-      toast.error('Error al leer el archivo')
+      toast.error('Error al leer el archivo', { id: toastId })
     }
   }
 
@@ -413,7 +417,6 @@ export default function EmployeesPage() {
 
       fetchData()
     } catch (err) {
-      console.error(err)
       toast.error('Error al importar')
     } finally {
       if (longImportTimer) clearTimeout(longImportTimer)
@@ -483,7 +486,6 @@ export default function EmployeesPage() {
       downloadExcel(headers, rowsData, `empleados_export.xlsx`, 'Empleados')
       toast.success('Datos exportados correctamente')
     } catch (err) {
-      console.error(err)
       toast.error('Error al exportar')
     }
   }
@@ -666,7 +668,6 @@ export default function EmployeesPage() {
       // refresh data set
       await fetchData()
     } catch (err) {
-      console.error(err)
       toast.error('Error al crear empleado')
     } finally {
       setCreating(false)
@@ -684,7 +685,6 @@ export default function EmployeesPage() {
       toast.success('Empleado actualizado')
       await fetchData()
     } catch (err) {
-      console.error(err)
       toast.error('Error al actualizar empleado')
     } finally {
       setEditing(null)
@@ -698,7 +698,6 @@ export default function EmployeesPage() {
       if (!resp.ok || j.success === false) return toast.error('Error al eliminar')
       toast.success('Empleado eliminado')
     } catch (err) {
-      console.error(err)
       toast.error('Error al eliminar')
     } finally {
       fetchData()
