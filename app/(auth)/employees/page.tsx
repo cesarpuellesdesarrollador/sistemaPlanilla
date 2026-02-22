@@ -804,6 +804,13 @@ export default function EmployeesPage() {
           </div>
         </div>
 
+        {creating && (
+          <div className="card mt-4 p-4 mb-4">
+            <h3 className="text-lg font-semibold mb-2">Crear trabajador</h3>
+            <EmployeeForm initial={createEmptyWorker()} onCancel={() => setCreating(false)} onSubmit={handleCreate} />
+          </div>
+        )}
+
         <div className="pb-4">
           <SearchBox
             value={searchQ}
@@ -821,13 +828,6 @@ export default function EmployeesPage() {
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters((s) => !s)}
         />
-
-        {creating && (
-          <div className="card mt-4 p-4">
-            <h3 className="text-lg font-semibold mb-2">Crear trabajador</h3>
-            <EmployeeForm initial={createEmptyWorker()} onCancel={() => setCreating(false)} onSubmit={handleCreate} />
-          </div>
-        )}
 
         {editing && (
           <div className="card mt-4 p-4">
