@@ -88,19 +88,19 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         }
         onSubmit(payload)
       }}
-      className="grid grid-cols-1 md:grid-cols-3 gap-3"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
     >
-        <div className="md:col-span-3">
+        <div className="sm:col-span-2 lg:col-span-3 min-h-[104px]">
         <label className="text-xs text-slate-400 mb-1 block">Nombre completo</label>
         <input placeholder="Ingrese nombre completo" aria-invalid={Boolean(errors.fullName)} aria-describedby={`${errors.fullName ? 'err-fullname' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.fullName ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100`} value={form.fullName || ''} onChange={(e) => setField('fullName', e.target.value)} />
         {errors.fullName && <p id="err-fullname" className="mt-2 text-xs text-red-400">{errors.fullName}</p>}
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="text-xs text-slate-400 mb-1 block">Departamento</label>
         <Select.Root value={String(form.departamento ?? '')} onValueChange={(v) => setField('departamento', v)}>
-          <Select.Trigger aria-invalid={Boolean(errors.departamento)} aria-describedby={`${errors.departamento ? 'err-departamento' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.departamento ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 flex items-center justify-between text-sm`}>
-            <Select.Value placeholder="Seleccionar departamento" />
+          <Select.Trigger aria-invalid={Boolean(errors.departamento)} aria-describedby={`${errors.departamento ? 'err-departamento' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.departamento ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 flex items-center justify-between text-sm whitespace-nowrap`}>
+            <Select.Value placeholder="Departamento" />
             <Select.Icon>
               <ChevronDown size={16} className="text-slate-400" />
             </Select.Icon>
@@ -121,13 +121,13 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         {errors.departamento && <p id="err-departamento" className="mt-2 text-xs text-red-400">{errors.departamento}</p>}
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="text-xs text-slate-400 mb-1 block">Ocupación</label>
         <input placeholder="Ej. Recepcionista, Cocinero/a" aria-invalid={Boolean(errors.ocupacion)} aria-describedby={`${errors.ocupacion ? 'err-ocupacion' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.ocupacion ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100`} value={form.ocupacion || ''} onChange={(e) => setField('ocupacion', e.target.value)} />
         {errors.ocupacion && <p id="err-ocupacion" className="mt-2 text-xs text-red-400">{errors.ocupacion}</p>}
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="block text-xs text-slate-400 mb-1">Estado</label>
         <Select.Root value={String(form.estado ?? 'activo')} onValueChange={(v) => setField('estado', v as any)}>
           <Select.Trigger className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 flex items-center justify-between text-sm">
@@ -153,13 +153,13 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         </Select.Root>
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="block text-xs text-slate-400 mb-1">Código personal de identificación</label>
         <input placeholder="Ej. EMP-000001" aria-invalid={Boolean(errors.employeeNumber)} aria-describedby={`${errors.employeeNumber ? 'err-empnumber' : ''}`} className={`w-full px-3 py-2 bg-white dark:bg-slate-800 border ${errors.employeeNumber ? 'border-red-600' : 'border-slate-200'} dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100`} value={form.employeeNumber || ''} onChange={(e) => setField('employeeNumber', e.target.value)} />
         {errors.employeeNumber && <p id="err-empnumber" className="mt-2 text-xs text-red-400">{errors.employeeNumber}</p>}
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="flex items-center gap-2 text-xs text-slate-400 mb-1">
           <span>Email (opcional)</span>
         </label>
@@ -167,7 +167,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         {errors.email && <p className="mt-2 text-xs text-red-400">{errors.email}</p>}
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="flex items-center gap-2 text-xs text-slate-400 mb-1">
           <span>Llegada planificada</span>
           <span title="Fecha en la que se espera que comience la relación laboral" className="inline-block"><Info className="h-4 w-4 text-slate-500" aria-hidden="true" /></span>
@@ -176,7 +176,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         <p id="help-llegada" className="mt-1 text-xs text-slate-500">Formato yyyy-mm-dd. También se aceptan dd/mm/yyyy al importar CSV.</p>
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="flex items-center gap-2 text-xs text-slate-400 mb-1">
           <span>Salida planificada</span>
           <span title="Fecha estimada de salida o fin del contrato/periodo" className="inline-block"><Info className="h-4 w-4 text-slate-500" aria-hidden="true" /></span>
@@ -186,7 +186,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         {errors.range && <p id="err-range" className="mt-2 text-xs text-red-400">{errors.range}</p>}
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="flex items-center gap-2 text-xs text-slate-400 mb-1">
           <span>Inicio permiso trabajo</span>
           <span title="Fecha de inicio del permiso de trabajo (si aplica)" className="inline-block"><Info className="h-4 w-4 text-slate-500" aria-hidden="true" /></span>
@@ -195,7 +195,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         <p id="help-permiso-start" className="mt-1 text-xs text-slate-500">Si el trabajador necesita permiso de trabajo, indique el inicio.</p>
       </div>
 
-      <div>
+      <div className="min-h-[104px]">
         <label className="flex items-center gap-2 text-xs text-slate-400 mb-1">
           <span>Fin permiso trabajo</span>
           <span title="Fecha fin del permiso de trabajo" className="inline-block"><Info className="h-4 w-4 text-slate-500" aria-hidden="true" /></span>
@@ -205,7 +205,7 @@ export default function EmployeeForm({ initial, onSubmit, onCancel }: { initial:
         {errors.permisoRange && <p id="err-permiso" className="mt-2 text-xs text-red-400">{errors.permisoRange}</p>}
       </div>
 
-      <div className="flex items-end gap-2 md:col-span-3">
+      <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
         <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white" disabled={hasErrors}>Guardar</Button>
         <Button type="button" variant="outline" onClick={() => onCancel && onCancel()}>Cancelar</Button>
       </div>
